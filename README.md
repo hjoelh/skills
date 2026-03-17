@@ -2,6 +2,12 @@
 
 This repository is a `skills.sh`-installable collection of agent skills. Each installable skill lives in `skills/<slug>/`, and each skill is self-contained so agents can copy, review, and evolve them independently.
 
+Install from GitHub:
+
+```bash
+npx skills add hjoelh/skills
+```
+
 ## How Discovery Works
 
 `skills.sh` discovers skills by looking for valid `SKILL.md` files. In this repo, all published skills live under `skills/`.
