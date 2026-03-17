@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit"
+  short_description: "Stages and commits everything fast."
+  default_prompt: "Use $commit to stage every change in this repo and commit immediately."
