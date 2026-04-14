@@ -10,11 +10,11 @@ Create the draft pull request with `gh`, targeting the repository's default bran
 ## Workflow
 
 1. Inspect the current git state with `git branch --show-current`, `git rev-parse --abbrev-ref HEAD`, and `git status --short`.
-2. If there are unstaged, staged, or uncommitted repo changes that belong in the PR, stage and commit them before opening the PR.
-3. Resolve the PR head branch:
+2. Resolve the PR head branch:
    - If `git branch --show-current` returns a non-default feature branch, use it.
    - If the repo is on detached HEAD, create and switch to a feature branch from the current commit before continuing.
    - If the current branch is a base or integration branch such as `main`, `master`, or `dev`, create and switch to a feature branch before continuing.
+3. If there are unstaged, staged, or uncommitted repo changes that belong in the PR, stage and commit them on the resolved PR branch before opening the PR.
 4. Determine the default base branch in this order:
    - `git symbolic-ref --quiet --short refs/remotes/origin/HEAD` and strip the `origin/` prefix.
    - `git remote show origin` and read the `HEAD branch` line.
@@ -30,7 +30,8 @@ Create the draft pull request with `gh`, targeting the repository's default bran
 - If the repo is on detached HEAD, create a feature branch from the current commit instead of stopping.
 - If the current branch is the default branch or another integration branch like `dev`, create a feature branch before opening the PR.
 - If the current branch is already a suitable feature branch, reuse it instead of creating a new one.
-- If the PR-worthy changes are not committed yet, create a commit before opening the PR.
+- Resolve the PR branch before creating any new commit so the commit lands on the correct branch.
+- If the PR-worthy changes are not committed yet, create a commit on the resolved PR branch before opening the PR.
 - If `gh pr create` fails because the branch is not pushed, push the current branch with upstream and retry with `--draft`.
 - Keep the title and body tight; default to 1 short title and 2-4 body bullets or sentences.
 - Always open the PR as a draft, even if the user does not explicitly ask for one.

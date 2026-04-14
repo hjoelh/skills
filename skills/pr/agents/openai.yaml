@@ -1,4 +1,4 @@
 interface:
   display_name: "PR"
   short_description: "Creates a concise draft GitHub PR from the current git state."
-  default_prompt: "Use $pr to create any needed commit, reuse a suitable feature branch when one exists, create a branch when starting from detached HEAD or an integration branch like main or dev, and open a concise draft PR into the repo default branch with no test plan."
+  default_prompt: "Use $pr to first resolve the PR branch, reusing a suitable feature branch when one exists or creating one from detached HEAD or an integration branch like main or dev, then create any needed commit on that branch and open a concise draft PR into the repo default branch with no test plan."
