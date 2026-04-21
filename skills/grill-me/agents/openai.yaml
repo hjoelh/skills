@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grill Me"
+  short_description: "Stress-tests a plan or design one decision at a time."
+  default_prompt: "Use $grill-me to rigorously interview me about this plan or design, exploring any discoverable facts first, then asking one question at a time with a recommended answer until the key branches and dependencies are resolved."
