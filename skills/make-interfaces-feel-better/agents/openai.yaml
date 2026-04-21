@@ -1,0 +1,4 @@
+interface:
+  display_name: "Make Interfaces Feel Better"
+  short_description: "Applies polished UI and design-engineering details to frontend work."
+  default_prompt: "Use $make-interfaces-feel-better to improve UI polish, frontend implementation details, animations, typography, surfaces, and interaction quality while preserving the existing product design."

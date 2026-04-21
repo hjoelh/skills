@@ -16,6 +16,7 @@ Current examples:
 
 - `skills/pr/`
 - `skills/commit/`
+- `skills/make-interfaces-feel-better/`
 
 Each skill folder should contain:
 
@@ -48,6 +49,7 @@ For actual install verification, run the command from outside the repo so genera
 ```bash
 cd /tmp
 npx skills add /absolute/path/to/repo --skill your-skill-name
+npx skills add /absolute/path/to/repo --skill make-interfaces-feel-better
 ```
 
 ## Authoring Rules
@@ -101,6 +103,7 @@ Local repo checks:
 npx skills add ./ --list
 cd /tmp && npx skills add /absolute/path/to/repo --skill pr
 cd /tmp && npx skills add /absolute/path/to/repo --skill commit
+cd /tmp && npx skills add /absolute/path/to/repo --skill make-interfaces-feel-better
 ```
 
 After publishing to GitHub:
