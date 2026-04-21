@@ -16,6 +16,7 @@ Current examples:
 
 - `skills/pr/`
 - `skills/commit/`
+- `skills/grill-me/`
 
 Each skill folder should contain:
 
