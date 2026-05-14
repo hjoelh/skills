@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Feedback"
+  short_description: "Triages GitHub PR review feedback."
+  default_prompt: "Use $pr-feedback to fetch and triage PR review comments from bots and humans, deduplicate overlapping feedback, walk me through each item, and help apply fixes or draft replies."
