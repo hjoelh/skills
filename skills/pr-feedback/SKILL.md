@@ -22,7 +22,7 @@ gh pr view --json number --jq '.number'
 REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
 ```
 
-Fetch from two sources:
+Fetch from three sources:
 
 ### 2a. Inline review comments (all reviewers)
 
@@ -40,15 +40,28 @@ gh api "repos/$REPO/pulls/$PR/reviews" --paginate
 
 CodeRabbit embeds "Outside diff range" comments in review bodies because GitHub doesn't allow inline comments outside the diff. Extract these from the **last** review body containing them (earlier ones are superseded).
 
-**Do NOT fetch** issue comments (`/issues/{PR}/comments`) — those are summaries, walkthroughs, and CI output, not actionable review feedback.
+### 2c. PR issue comments
+
+```bash
+gh api "repos/$REPO/issues/$PR/comments" --paginate
+```
+
+Issue comments often contain CI/deploy noise and non-actionable summaries, but some review agents post actionable feedback there. Fetch them and filter carefully so Claude, Cursor, human, or other review-agent feedback is triaged alongside inline review comments and review bodies.
 
 ## 3. Filter and build threads
 
 ### Filter out
 
 - **CI/deploy bots**: `vercel[bot]`, `github-actions[bot]`, `linear[bot]`
-- **CodeRabbit summaries**: Review bodies that don't contain "Outside diff range"
+- **CodeRabbit summaries and walkthroughs**: Review bodies that don't contain "Outside diff range", CodeRabbit issue-comment walkthroughs, and other non-actionable summary-only comments
+- **Non-actionable issue comments**: Status updates, generated summaries, release/deploy links, test output, or comments without a concrete question, concern, or requested change
 - **Pure affirmations**: Comments with no actionable content — "Neat", "Great stuff", "Nice one, thank you!", approval-only reviews with empty body
+
+### Include from issue comments
+
+- **Review-agent feedback**: Actionable issue comments from `claude[bot]`, `cursor[bot]`, CodeRabbit, Graphite, or other review agents when they identify a concrete concern, ask a review question, or suggest a code/design change
+- **Human review feedback**: Human issue comments that ask review questions, request changes, raise architectural concerns, or include specific code suggestions
+- **Mixed summary + action comments**: Include only the actionable portions when a comment combines a summary with concrete feedback
 
 ### Build reply threads
 
@@ -63,14 +76,14 @@ Group comments by `in_reply_to_id` to reconstruct conversation threads. A thread
 
 ## 4. Categorize and deduplicate
 
-Dispatch a subagent (Task tool, subagent_type: "general-purpose", model: "haiku") with all remaining comments. Send each comment as a JSON object with: `id`, `author`, `path`, `line` (or line range), `body`, `is_bot` (boolean), `thread` (array of replies with author and body). The subagent does two things:
+Dispatch a subagent (Task tool, subagent_type: "general-purpose", model: "haiku") with all remaining comments. Send each comment as a JSON object with: `id`, `source_type` (`inline_review`, `review_body`, or `issue_comment`), `author`, `path` (nullable), `line` (or line range, nullable), `body`, `is_bot` (boolean), `thread` (array of replies with author and body). The subagent does two things:
 
 ### 4a. Categorize each comment
 
 | Category                | Source               | Characteristics                                     |
 | ----------------------- | -------------------- | --------------------------------------------------- |
-| `bot-suggestion`        | CodeRabbit, Graphite | Has concrete code fix (suggestion/diff block)       |
-| `bot-observation`       | CodeRabbit, Graphite | Flags issue but no concrete fix                     |
+| `bot-suggestion`        | Review agents        | Has concrete code fix (suggestion/diff block)       |
+| `bot-observation`       | Review agents        | Flags issue but no concrete fix                     |
 | `human-code-suggestion` | Human                | Includes a specific code change                     |
 | `human-architectural`   | Human                | High-level — about approach, design, tradeoffs      |
 | `human-question`        | Human                | Asks a question (ends with `?` or is interrogative) |
@@ -78,7 +91,7 @@ Dispatch a subagent (Task tool, subagent_type: "general-purpose", model: "haiku"
 
 ### 4b. Deduplicate overlapping bot comments
 
-When CodeRabbit and Graphite flag the same issue on the same or overlapping lines in the same file, merge into one item:
+When review agents flag the same issue on the same or overlapping lines in the same file, or in issue comments that clearly reference the same concern, merge into one item:
 
 - Keep the more complete suggestion
 - Note which bots flagged it
@@ -99,6 +112,7 @@ Return JSON:
     "items": [
       {
         "id": 123,
+        "source_type": "inline_review",
         "path": "mapper.go",
         "line": 62,
         "severity": "major",
@@ -132,6 +146,12 @@ Return JSON:
 - **Description**: Plain text problem statement
 - **Suggestion**: Code in ` ```suggestion ` blocks (same format as GitHub suggestions)
 - **Attribution**: Ends with "_Spotted by Graphite Agent_"
+
+### Claude, Cursor, and other issue-comment review agents
+
+- **Actionability**: Include only concrete findings, review questions, requested changes, or code/design suggestions
+- **Location**: Use referenced file paths, line numbers, symbols, or quoted snippets when present; leave `path` and `line` null if the comment is PR-level but still actionable
+- **Suggestion**: Preserve code blocks, bullet recommendations, or explicit "should" / "consider" changes as the proposed solution context
 
 ### Human comments
 
@@ -238,6 +258,12 @@ gh api "repos/$REPO/pulls/$PR/comments/$COMMENT_ID/replies" -f body="$REPLY"
 gh api "repos/$REPO/pulls/$PR/reviews/$REVIEW_ID/comments" \
   -f body="Regarding $PATH lines $LINES: $REPLY" \
   -f path="$PATH" -f line=1 -f side="RIGHT"
+```
+
+**Issue comments** (PR-level comments):
+
+```bash
+gh api "repos/$REPO/issues/$PR/comments" -f body="$REPLY"
 ```
 
 ### Ignore reasons (bot comments)
