@@ -155,8 +155,8 @@ Present: source(s), file, line, severity, explanation, suggested code change.
 
 Options (AskUserQuestion):
 
-- **Accept suggestion** — Apply the suggested change at all locations in the group
-- **Fix differently** — Address the issue another way
+- **Review solution** — Show the proposed change for all locations in the group and ask before applying
+- **Review alternate fix** — Propose another way to address the issue and ask before applying
 - **Ignore** — Dismiss (will reply with reason)
 
 ### For `bot-observation`
@@ -165,7 +165,7 @@ Present: what was identified, relevant code context.
 
 Options:
 
-- **Address now** — Implement a fix
+- **Review fix** — Propose a fix and ask before applying
 - **Defer** — Acknowledge as future work
 - **Ignore** — Dismiss
 
@@ -187,7 +187,7 @@ Present:
 
 Options:
 
-- **Agree and implement** — Make the change
+- **Review implementation** — Propose the change and ask before applying
 - **Agree but defer** — Acknowledge, note for future (draft reply for user approval)
 - **Discuss** — Draft a reply exploring the tradeoff (user reviews before posting)
 - **Push back** — Draft a reply explaining why current approach is preferred (user reviews before posting)
@@ -211,13 +211,14 @@ Present: the feedback and current code.
 
 Options:
 
-- **Accept** — Make the change
+- **Review change** — Show the proposed change and ask before applying
 - **Ignore** — No action
 
 ## 7. Act on decisions
 
 ### Applying code changes
 
+- Before using Edit or Write, present the exact intended change when possible. If the exact patch is not practical to show, present a concise solution summary with the affected files and lines. Wait for the user to approve that proposed solution before mutating files.
 - Read the file and apply using the Edit tool
 - **`suggestion` blocks**: Exact replacement text for the referenced lines
 - **`diff` blocks**: Match `-` lines to find old text, replace with `+` lines
