@@ -19,6 +19,7 @@ Current examples:
 - `skills/grill-me/`
 - `skills/make-interfaces-feel-better/`
 - `skills/pr-feedback/`
+- `skills/thermo-nuclear-code-quality-review/`
 
 Each skill folder should contain:
 
@@ -53,6 +54,7 @@ cd /tmp
 npx skills add /absolute/path/to/repo --skill your-skill-name
 npx skills add /absolute/path/to/repo --skill make-interfaces-feel-better
 npx skills add /absolute/path/to/repo --skill pr-feedback
+npx skills add /absolute/path/to/repo --skill thermo-nuclear-code-quality-review
 ```
 
 ## Authoring Rules
@@ -108,6 +110,7 @@ cd /tmp && npx skills add /absolute/path/to/repo --skill pr
 cd /tmp && npx skills add /absolute/path/to/repo --skill commit
 cd /tmp && npx skills add /absolute/path/to/repo --skill make-interfaces-feel-better
 cd /tmp && npx skills add /absolute/path/to/repo --skill pr-feedback
+cd /tmp && npx skills add /absolute/path/to/repo --skill thermo-nuclear-code-quality-review
 ```
 
 After publishing to GitHub:
