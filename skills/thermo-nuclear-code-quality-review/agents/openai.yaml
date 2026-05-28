@@ -1,0 +1,4 @@
+interface:
+  display_name: "Thermo-Nuclear Code Quality Review"
+  short_description: "Runs a strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth."
+  default_prompt: "Use $thermo-nuclear-code-quality-review to run a harsh maintainability and code-quality review of the current branch."
