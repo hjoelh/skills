@@ -19,6 +19,7 @@ Current examples:
 - `skills/grill-me/`
 - `skills/make-interfaces-feel-better/`
 - `skills/pr-feedback/`
+- `skills/stack/`
 - `skills/thermo-nuclear-code-quality-review/`
 
 Each skill folder should contain:
