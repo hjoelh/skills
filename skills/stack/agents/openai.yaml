@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stack"
+  short_description: "Plans review-friendly stacks of new pull requests."
+  default_prompt: "Use $stack to analyze the current branch or a supplied GitHub PR and propose the smallest review-friendly stack of new PRs, with ordered titles, dependencies, scopes, and validation notes, without making any changes."
