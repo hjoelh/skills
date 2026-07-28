@@ -1,11 +1,11 @@
 ---
 name: verify-pr
-description: Verify the open GitHub pull request linked to the current branch, exercise changed UI behavior locally in Storybook or the actual application, capture and annotate desktop and mobile screenshots, publish them through 30-day signed Cloudflare Images URLs with scheduled deletion, and post a verification comment to the existing PR. Use after a PR already exists when asked to verify work, perform responsive visual QA, add screenshots, or document evidence on the current PR. Never create, commit, push, or open a PR.
+description: Verify the open GitHub pull request linked to the current branch, exercise changed UI behavior locally, capture high-quality desktop and mobile evidence, publish it through 30-day signed Cloudflare Images URLs, and post a verification comment to the existing PR. Use after a PR already exists when asked to verify work, perform responsive visual QA, add screenshots, or document evidence on the current PR. Never create, commit, push, or open a PR.
 ---
 
 # Verify PR
 
-Verify the current branch's existing pull request and publish concise, annotated evidence. Do not create a PR or alter implementation code.
+Verify the current branch's existing pull request and publish concise, high-quality evidence. Do not create a PR or alter implementation code.
 
 ## Boundaries
 
@@ -13,9 +13,9 @@ Verify the current branch's existing pull request and publish concise, annotated
 - Post verification as a new PR comment.
 - Do not modify implementation code except for the narrow, temporary representative-data override described below. If verification fails, stop and report the failure.
 - Do not claim behavior that was not exercised.
-- Do not upload secrets, tokens, personal data, production customer data, or other sensitive information.
-- Keep raw screenshots temporary and local. Upload only reviewed, annotated, and redacted copies.
-- Use Cloudflare Images with signed delivery for every published screenshot. Make each URL expire and each uploaded image delete after 30 days. Do not commit screenshots to the repository or use GitHub's browser uploader.
+- Do not upload secrets, personal data, production customer data, or other sensitive information.
+- Use Cloudflare Images with signed delivery for every published screenshot. Make each URL expire after 30 days. Do not commit evidence or use GitHub's browser uploader.
+- Keep local evidence until the user has inspected and accepted it. Underlying Cloudflare uploads are retained.
 
 ## 1. Resolve the PR and verification target
 
@@ -38,160 +38,100 @@ Inspect the PR body, linked issue when available, and the complete branch diff a
 
 ## 2. Choose the verification surface
 
-Use Storybook when the change is an isolated component whose important states are fully represented by props.
+Use the surface that can faithfully exercise the behavior:
 
-Use the actual application when routing, navigation, authentication, permissions, server data, mutations, persistence, application layout, or multi-component interaction matters.
+- Use Storybook for an isolated component whose important states are fully represented by props.
+- Use the application when routing, authentication, permissions, server data, persistence, layout, or multi-component interaction matters.
+- Use both when component variants and application integration need separate proof.
 
-Use both when Storybook proves component variants and the application proves integration.
-
-State the selected surface and why in the PR comment.
-
-Discover and follow repository-specific commands. Do not assume that Storybook exists or invent commands. Prefer existing stories, fixtures, typed network stubs, and development scripts.
+State the selected surface and why in the PR comment. Discover and follow repository-specific commands; do not invent them.
 
 ### Force representative data when necessary
 
-When using the actual application, first try to reach the target state through realistic navigation, existing development data, fixtures, or typed network stubs.
+First try realistic navigation, existing development data, fixtures, or typed network stubs. If the state cannot reasonably be reached, temporarily force realistic, nonsensitive props:
 
-If the correct data cannot reasonably be found or created, temporarily force representative data through hard-coded props so the changed UI can be rendered and reviewed. Treat this only as presentation verification:
-
-- use realistic, nonsensitive values;
 - make the smallest local override possible;
-- do not overwrite or disturb pre-existing uncommitted work;
-- never commit or push the override;
-- do not claim that API integration, persistence, permissions, or end-to-end data flow was verified;
-- state clearly in the PR comment that representative data was forced through props;
-- remove the override immediately after capturing evidence;
-- confirm that the working tree has returned exactly to its prior state before uploading or commenting.
+- do not disturb pre-existing work, commit, or push the override;
+- treat the result only as presentation verification;
+- disclose the override and do not claim integration coverage;
+- remove it immediately after capture and restore the exact prior working-tree state.
 
-Prefer Storybook instead when it already provides the same state more safely and accurately.
+Prefer an existing Storybook story when it represents the same state more safely.
 
-## 3. Run relevant checks
+## 3. Exercise the behavior
 
-Run the smallest meaningful automated checks required by the repository and diff. Automated checks support behavioral verification but never replace it.
+Run the smallest meaningful automated checks required by the repository and diff, then exercise the changed behavior as a user. Cover the states and interactions affected by the change, including keyboard and pointer behavior when relevant.
 
-Exercise the changed behavior as a user:
-
-- begin from a realistic initial state;
-- perform the relevant interaction or journey;
-- verify the expected result and important intermediate states;
-- cover loading, empty, error, success, and permission states when the change affects them;
-- verify keyboard and pointer interaction when relevant.
-
-If any required check fails, do not upload screenshots or post a successful verification comment. Report the failure with reproducible details.
+If a required check fails, do not upload screenshots or post a successful verification comment. Report the failure with reproducible details.
 
 ## 4. Verify responsive behavior
 
-For every user-visible change, capture at least:
+For every visual change, verify at least:
 
-- desktop: `1440 × 900`;
-- mobile: `390 × 844`.
+- desktop: `1440 × 900` CSS pixels;
+- mobile: `390 × 844` CSS pixels.
 
-Capture the same meaningful state at both sizes when possible. Add another viewport only when the diff affects a repository-defined breakpoint or a distinct responsive layout.
+Use the same meaningful state at both sizes when possible. Add another viewport only for a relevant breakpoint or distinct layout. On mobile, check overflow, wrapping, touch targets, fixed elements, dialogs, and scrolling. On desktop, check alignment, hierarchy, hover, focus, and overlays.
 
-At mobile size, check:
+Omit responsive evidence only for genuinely non-visual work and explain the omission.
 
-- no horizontal overflow;
-- readable wrapping and truncation;
-- touch targets and reachable controls;
-- fixed or sticky elements;
-- dialogs, menus, keyboards, and scrolling.
+## 5. Produce high-quality evidence
 
-At desktop size, check:
+Verification, browser control, and capture may use different tools. Choose any safe capture and annotation approach that meets the quality requirements; do not assume a screenshot is suitable because a particular tool produced it.
 
-- alignment and spacing;
-- content width and hierarchy;
-- hover and focus behavior;
-- dialogs, menus, and overlays.
+For every final image:
 
-Omit responsive screenshots only for genuinely non-visual work. Explain the omission in the PR comment.
+- capture the verified result, not an arbitrary initial state;
+- make the image sharp, high-resolution, and free of visible compression artifacts;
+- record the CSS viewport separately from the output pixel dimensions;
+- ensure text, thin borders, and callouts remain clear at 100% zoom and at the size GitHub renders;
+- ensure the changed UI is large enough to review at GitHub's rendered size;
+- include a tight detail crop when the full responsive view makes the changed region too small;
+- redact sensitive information and discard evidence that cannot be made safe.
 
-## 5. Capture and annotate screenshots
-
-Capture the verified result of an interaction, not an arbitrary initial page.
-
-Inspect every raw screenshot before publishing it. Redact sensitive information and discard screenshots containing information that cannot be safely removed.
-
-Annotate each screenshot to explain the changed or verified behavior:
-
-- use at most three to five numbered callouts;
-- draw high-contrast boxes or arrows around exact areas;
-- keep labels outside important UI content;
-- use consistent numbering and one accent color;
-- describe outcomes such as `1. Submitted status appears`, not generic objects such as `1. Button`;
-- split crowded evidence into multiple screenshots.
-
-Prefer temporary browser-native overlays before capture because they preserve text quality and require no image-editor dependency. Inject uniquely named verification overlays, capture the screenshot, and remove the overlays immediately. If browser-native overlays are unavailable, use an available image annotation tool without altering the underlying application.
-
-The PR prose must repeat the numbered callout descriptions so the evidence remains understandable and accessible.
+Keep annotations concise: use no more than three to five numbered callouts, avoid covering important content, and repeat their descriptions in the PR prose.
 
 ## 6. Configure Cloudflare Images
 
-On macOS, store the Cloudflare Images API token as a generic login Keychain item:
+Use two separate generic login Keychain items on macOS:
 
 ```text
 Service:  cloudflare-images-token
 Account:  <32-character Cloudflare Account ID>
 Password: <Cloudflare Images API token>
+
+Service:  cloudflare-images-signing-key
+Account:  default
+Password: <Cloudflare Images signing key>
 ```
 
-When the item is missing, explain why it is needed and ask the user before modifying Keychain. Never ask the user to paste a token into chat.
+Use `cloudflare-images-token` only for Cloudflare API authentication. Use `cloudflare-images-signing-key` only to sign delivery URLs. Retrieve each secret immediately before use; never print, log, pass it as a command argument, or write it to the local evidence record.
 
-Create it interactively with:
+When either item is missing, explain why it is needed and ask before modifying Keychain. Never ask the user to paste a secret into chat. Create missing items interactively with `security add-generic-password ... -w`, keeping `-w` last, and never use `security -A`.
 
-```bash
-security add-generic-password \
-  -s "cloudflare-images-token" \
-  -a "YOUR_CLOUDFLARE_ACCOUNT_ID" \
-  -l "Cloudflare Images Token" \
-  -w
-```
+On non-macOS systems, stop and give platform-appropriate secret-storage instructions. Do not store credentials in plaintext.
 
-Keep `-w` last so macOS prompts securely. Never pass the token as a command argument, print it, log it, or use `security -A`.
+## 7. Upload and validate evidence
 
-Store the signing key separately in Keychain with the same safeguards. Retrieve the Account ID from the API token item's `acct` attribute, and retrieve tokens or signing keys only immediately before use. Account-owned tokens must be verified with:
+Use the existing predefined `public` variant. Do not create or modify Cloudflare variants. Before upload, require `public` to:
 
-```text
-GET /client/v4/accounts/<ACCOUNT_ID>/tokens/verify
-```
+- use `fit: scale-down`;
+- use `metadata: none`;
+- have width and height bounds at least as large as the source image;
+- set `neverRequireSignedURLs: false`.
 
-Use the user-token verification endpoint only for user-owned tokens.
+For each final image:
 
-On non-macOS systems, stop and give platform-appropriate secret-storage instructions. Do not silently store credentials in plaintext.
+- validate the API token and `public` variant;
+- upload with `requireSignedURLs=true`;
+- sign the `public` delivery URL for exactly 30 days with `cloudflare-images-signing-key`;
+- fetch and visually inspect the signed delivery before posting;
+- confirm the delivered image remains high quality, readable, and appropriately sized;
+- retain a local, secret-free record of the image ID, signed URL, expiry, viewport, dimensions, and PR metadata.
 
-## 7. Upload evidence to Cloudflare
+If the delivered image is blurry, compressed, unexpectedly resized, or otherwise hard to review, do not post it. Diagnose the affected stage and recapture or re-upload until the delivered evidence is high quality.
 
-Upload each final annotated image:
-
-```text
-POST /client/v4/accounts/<ACCOUNT_ID>/images/v1
-Authorization: Bearer <TOKEN>
-multipart field: file
-```
-
-Include nonsensitive metadata when practical:
-
-```json
-{
-  "repository": "owner/repository",
-  "pull_request": 123,
-  "commit": "full commit SHA",
-  "viewport": "1440x900",
-  "purpose": "desktop verification",
-  "delete_after": "RFC3339 timestamp exactly 30 days after upload"
-}
-```
-
-Use signed delivery only:
-
-- Upload with `requireSignedURLs=true`. Never publish an unsigned or public fallback URL.
-- Generate a signed variant URL whose expiry is exactly 30 days after upload.
-- Register the Cloudflare image ID for deletion at the same 30-day deadline in the configured durable cleanup mechanism.
-- Confirm the deletion schedule before posting the PR comment. URL expiry only blocks delivery; it does not delete the underlying image.
-- If no signing key or durable deletion mechanism is configured, stop before uploading and report the missing prerequisite.
-
-Prefer a scale-down variant no wider than 1600 pixels with image metadata stripped. Verify every returned URL before posting it. Stop if upload or delivery verification fails.
-
-Record each Cloudflare image ID locally until the PR comment succeeds so failed runs can be cleaned up. After the comment succeeds, confirm the durable cleanup record contains the image ID and exact deletion timestamp.
+When replacing evidence, re-upload it and generate a new valid signed URL. Do not append unsigned cache-busting parameters.
 
 ## 8. Post the verification comment
 
@@ -208,14 +148,18 @@ Use this structure:
 
 Verified locally in the application because this change affects the complete user journey.
 
-### Desktop — 1440 × 900
+### Desktop — 1440 × 900 CSS viewport
+
+Delivered image: 1440 × 900 pixels
 
 1. The submitted status appears in the summary.
 2. The updated action remains aligned with existing controls.
 
 ![Annotated desktop verification](CLOUDFLARE_URL)
 
-### Mobile — 390 × 844
+### Mobile — 390 × 844 CSS viewport
+
+Delivered image: 390 × 844 pixels
 
 1. The status wraps without truncation.
 2. The action remains reachable without horizontal scrolling.
@@ -230,21 +174,20 @@ Verified locally in the application because this change affects the complete use
 
 Verified against commit `FULL_COMMIT_SHA`.
 
-Evidence links expire and uploaded images are deleted after 30 days.
+Evidence links expire after 30 days. Underlying Cloudflare uploads are retained.
 ```
 
-Mention only checks that actually ran. Use descriptive image alt text. Keep the comment concise enough for reviewers to scan.
+Mention only checks that actually ran. Disclose representative props or data and distinguish presentation verification from integration coverage. Use descriptive image alt text.
 
-After posting, return the PR URL, comment URL when available, verified commit SHA, selected verification surface, number of uploaded screenshots, URL expiry timestamp, and scheduled image-deletion timestamp.
+After posting, add the returned comment URL to the local evidence record. Return the PR URL, comment URL, verified commit SHA, selected surface, evidence count, expiry timestamp, and local evidence directory. Keep that directory until the user accepts the evidence, then remove only the local artifacts.
 
 ## Failure behavior
 
-Do not post partial or misleading evidence. When blocked, report:
+Do not post partial or misleading evidence. Report:
 
-- what was attempted;
-- the exact failing step;
+- what was attempted and the exact failing step;
 - relevant nonsecret output;
 - whether any Cloudflare images were uploaded;
-- whether uploaded images were cleaned up;
-- whether deletion was scheduled for any retained images;
+- whether an incomplete upload was cleaned up;
+- the local evidence directory and record when present;
 - the smallest action required to continue.

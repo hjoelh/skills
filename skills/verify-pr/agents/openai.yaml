@@ -1,4 +1,4 @@
 interface:
   display_name: "Verify PR"
-  short_description: "Verify PRs with expiring visual evidence"
-  default_prompt: "Use $verify-pr to verify the open pull request, publish annotated evidence through 30-day signed URLs, and ensure the uploaded images are deleted after 30 days."
+  short_description: "Verify PRs with high-quality visual evidence"
+  default_prompt: "Use $verify-pr to verify the open pull request and publish sharp, validated visual evidence through 30-day signed Cloudflare URLs."
