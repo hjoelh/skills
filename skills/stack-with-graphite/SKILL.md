@@ -1,45 +1,72 @@
 ---
 name: stack-with-graphite
-description: Analyze the current branch or a supplied GitHub pull request, split it into the smallest review-friendly stack, materialize the stack with the Graphite CLI, validate every branch, and submit the stacked pull requests. Use when the user asks to create, build, split, or submit a PR stack with Graphite or `gt`, rather than only planning one.
+description: Analyze the current branch or a supplied GitHub pull request, propose the smallest review-friendly stack, wait for the user to confirm the plan, then materialize and submit it with the Graphite CLI. Use when the user wants to plan a PR stack and execute the approved plan with Graphite or `gt`.
 ---
 
 # Stack with Graphite
 
-Turn existing work into a review-friendly Graphite stack and submit it as draft pull requests. Perform the work; do not stop after proposing a plan.
+Plan a review-friendly stack first. Do not mutate git state, Graphite metadata, or GitHub until the user explicitly confirms the proposed plan. After confirmation, implement that exact plan with the Graphite CLI and submit it as draft pull requests.
 
-## Establish the source and prerequisites
+## Phase 1: Plan without making changes
 
-1. Inspect repository instructions before changing anything.
-2. Confirm `gt` is available and inspect `gt --version` plus the help for each mutating command before using it. Prefer current commands over remembered aliases.
-3. Capture the recovery state with:
-   - `git status --short`
-   - `git branch --show-current`
-   - `git rev-parse HEAD`
-   - `git worktree list`
-   - `gt trunk`
-   - `gt log short --stack`
-4. If the user supplies a PR number or URL, inspect it with `gh pr view` and `gh pr diff`, then use `gt get <pr-number>` when the stack is not already local.
-5. Detect the repository's default or integration trunk. If Graphite is not initialized, run `gt init --trunk <branch>` only when that branch is unambiguous; otherwise ask the user.
-6. Preserve unrelated work. Do not include, discard, stash, or rewrite changes outside the requested source.
+### Identify the source
 
-Stop and report the exact prerequisite when `gt` is missing, Graphite authentication is required, the source is ambiguous, another worktree owns a branch that must be rewritten, or unrelated changes overlap the intended split.
+- Inspect repository instructions.
+- If the user supplies a PR number or URL, inspect its title, base, head, files, commits, and diff with `gh pr view` and `gh pr diff`. Do not check it out or run `gt get` yet.
+- Otherwise inspect the current branch, status, detected default or integration base, commit history, and diff from the base.
+- Preserve uncommitted work in the analysis and distinguish it from committed changes.
+- If the source is ambiguous, state the assumption and identify the exact branch or PR analyzed.
 
-## Design the smallest useful stack
+### Decide whether to split
 
-Inspect the diff from trunk, commit history, tests, migrations, generated files, and dependency direction. Choose one PR when the work is already a coherent review unit.
+First determine whether one PR is the clearest review unit. Recommend one PR when the work is tightly coupled, cannot be validated independently, or splitting would add coordination without reducing reviewer effort.
 
-Split only when every branch has an independently understandable purpose and the split materially reduces reviewer effort. Good boundaries include:
+Split only when each proposed PR has a coherent purpose and the split materially improves reviewability. Good boundaries include:
 
-- mechanical setup or refactoring that enables later behavior;
-- foundations required by later branches;
-- separate user-visible behaviors;
+- independently understandable setup, refactoring, or mechanical changes;
+- a foundation required by later behavior;
+- separate user-visible behaviors or components;
 - risky changes that deserve focused review.
 
-Keep implementation with its required tests, migrations, generated output, and configuration when separating them would leave a misleading or broken intermediate state. Prefer a linear cumulative stack; Graphite stacks are dependent branches, not a collection of independent sibling PRs.
+Keep coupled implementation, required tests, migrations, generated output, and configuration together when separating them would leave an incomplete or misleading intermediate state. Do not create extra PRs merely to increase the count.
 
-Before mutating, state the proposed ordered branches, contents, dependency direction, and validation. Use titles in the exact form `[STACK/<feature>] (n/total) Description`, with a short lowercase hyphenated feature name. Use `(1/1)` when no split is justified.
+Prefer cumulative dependent branches because Graphite models a stack through parent relationships. Recommend independent branches only when the slices are genuinely non-overlapping; explain that those branches are not one Graphite stack.
 
-## Materialize with Graphite
+### Present the plan
+
+Return:
+
+1. A source summary identifying the branch or PR, base, scope, and whether uncommitted work is included.
+2. The recommended number of PRs and why the work should or should not be split.
+3. An ordered table or list where every PR includes:
+   - a title in the exact form `[STACK/<feature>] (n/total) Description`;
+   - a proposed lowercase hyphenated branch name;
+   - its purpose and why the boundary improves reviewability;
+   - included files or change groups;
+   - its base, parent, dependencies, and merge order;
+   - intermediate-state constraints;
+   - validation and focused review notes.
+4. Why this is the smallest review-friendly decomposition and why obvious alternative splits were rejected.
+
+Derive `<feature>` from the work using a short lowercase hyphenated label. Use `(1/1)` when one PR is correct.
+
+End by asking the user to confirm the proposed plan. Until they explicitly confirm, do not create or switch branches, commit, restack, push, modify the source, initialize Graphite, fetch a PR with Graphite, or open PRs.
+
+## Phase 2: Execute only after confirmation
+
+Treat an explicit approval such as “confirm,” “approved,” “go ahead,” or “submit it” in response to the plan as authorization to materialize and submit that plan. If the user requests changes, revise the plan and ask for confirmation again. Do not interpret the initial invocation of this skill as confirmation.
+
+### Establish Graphite prerequisites
+
+1. Confirm `gt` is available and inspect `gt --version` plus the help for each mutating command before using it. Prefer current commands over remembered aliases.
+2. Capture the recovery state with `git status --short`, `git branch --show-current`, `git rev-parse HEAD`, `git worktree list`, `gt trunk`, and `gt log short --stack`.
+3. If the confirmed source is a supplied PR that is not local, use `gt get <pr-number>`.
+4. Detect the repository's default or integration trunk. If Graphite is not initialized, run `gt init --trunk <branch>` only when that branch is unambiguous; otherwise ask the user.
+5. Preserve unrelated work. Do not include, discard, stash, or rewrite changes outside the confirmed plan.
+
+Stop and report the exact prerequisite when `gt` is missing, Graphite authentication is required, another worktree owns a branch that must be rewritten, or unrelated changes overlap the intended split.
+
+### Materialize with Graphite
 
 Choose the least destructive workflow supported by the source:
 
@@ -54,7 +81,7 @@ When splitting a branch that already has a PR, retain the original branch name f
 
 If a Graphite operation hits conflicts, inspect the conflict and resolve it only when the intended resolution is clear. Mark resolved files with `gt add` and continue with `gt continue`. Use `gt abort` when the correct resolution is uncertain; do not guess.
 
-## Validate the stack
+### Validate the stack
 
 1. Run `gt restack`.
 2. Inspect `gt log short --stack` and `gt log long`.
@@ -65,14 +92,14 @@ If a Graphite operation hits conflicts, inspect the conflict and resolve it only
 
 If validation reveals a bad boundary, fix the local stack with the appropriate Graphite operation and validate again before submission.
 
-## Preview and submit
+### Preview and submit
 
 1. Run `gt submit --stack --dry-run` and review the exact branches and PR operations.
 2. Submit new PRs as drafts with `gt submit --stack --draft --cli --edit`, preserving the planned titles and writing concise bodies that explain why each boundary exists and what changed.
 3. Do not enable merge-when-ready or publish drafts unless the user explicitly asks.
 4. Re-run `gt log short --stack` and collect the created or updated PR URLs from Graphite or `gh pr view`.
 
-## Report
+### Report
 
 Return:
 
