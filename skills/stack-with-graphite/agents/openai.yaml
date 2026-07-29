@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stack with Graphite"
+  short_description: "Builds and submits review-friendly Graphite stacks."
+  default_prompt: "Use $stack-with-graphite to split the current work into the smallest review-friendly stack, create it with the Graphite CLI, verify it, and submit the stack for review."
