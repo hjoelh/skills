@@ -5,7 +5,7 @@ description: Create a draft GitHub pull request from the current git state into 
 
 # PR
 
-Create the draft pull request with `gh`, targeting the repository's default branch unless the user explicitly asks for a different base. Reuse a suitable feature branch when one already exists, otherwise create a PR branch first.
+Create the draft pull request with `gh`, targeting the repository's default branch unless the user explicitly asks for a different base. Reuse a suitable feature branch when one already exists, otherwise create a PR branch first. Always use plain `git` commands for Git operations; never use Graphite (`gt`) or another Git wrapper.
 
 ## Workflow
 
@@ -26,6 +26,7 @@ Create the draft pull request with `gh`, targeting the repository's default bran
 
 ## Guardrails
 
+- Always use plain `git` for branch, commit, diff, and push operations. Never use Graphite (`gt`) or another Git wrapper.
 - Prefer the repo's detected default branch over assuming `main`.
 - If the repo is on detached HEAD, create a feature branch from the current commit instead of stopping.
 - If the current branch is the default branch or another integration branch like `dev`, create a feature branch before opening the PR.
