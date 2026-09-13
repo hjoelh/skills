@@ -14,6 +14,7 @@ npx skills add hjoelh/skills
 
 Current examples:
 
+- `skills/code-standards-pr/`
 - `skills/pr/`
 - `skills/commit/`
 - `skills/grill-me/`

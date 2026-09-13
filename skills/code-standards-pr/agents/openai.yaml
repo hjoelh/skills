@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Standards PR"
+  short_description: "Parallel review of PRs against repo AGENTS.md"
+  default_prompt: "Use $code-standards-pr to review the current PR or local branch diff against the repo AGENTS.md rules with parallel file-group reviewers."
