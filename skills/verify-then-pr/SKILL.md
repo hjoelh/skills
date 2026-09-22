@@ -37,7 +37,7 @@ Remove temporary capture overrides before the final checks and commit. Disclose 
 
 ## 4. Open the draft PR
 
-If the `pr` skill is installed, read and follow it for Git and draft creation after verification succeeds. This skill adds the required evidence section to its concise summary. Do not invoke `verify-pr`: that separate workflow requires an existing PR and uses Cloudflare uploads.
+If the `pr` skill is installed, read and follow it for Git and draft creation after verification succeeds. This skill adds the required evidence section to its concise summary.
 
 If `pr` is unavailable, use this self-contained fallback:
 
