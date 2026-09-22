@@ -13,7 +13,7 @@ Read repository instructions and inspect the user's request, working-tree change
 
 Resolve the intended base branch, defaulting to the repository's default branch. Record the before revision and current working-tree state. Check for an existing PR for this head before creating anything; reuse an existing draft instead of creating a duplicate. If it is already ready for review, report that conflict rather than silently changing its state.
 
-Check `gh auth status` and `gh pr edit --help` for `--attach`. The native syntax is `gh pr edit ... --attach`, not a standalone `github cli attach` or `gh attach` command. If unavailable, report the CLI upgrade or authentication requirement; do not silently substitute Cloudflare, release assets, or committed images.
+Attach screenshots with `gh pr edit ... --attach` and resolve any CLI errors as they arise.
 
 ## 2. Capture before
 
