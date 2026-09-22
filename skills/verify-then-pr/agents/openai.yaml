@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify then PR"
+  short_description: "Verify changes and open a draft PR with screenshots"
+  default_prompt: "Use $verify-then-pr to capture before and after screenshots, check the work, and open a draft PR with the evidence attached using GitHub CLI."

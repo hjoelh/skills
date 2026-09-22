@@ -23,6 +23,7 @@ Current examples:
 - `skills/stack-with-graphite/`
 - `skills/thermo-nuclear-code-quality-review/`
 - `skills/verify-pr/`
+- `skills/verify-then-pr/`
 
 Each skill folder should contain:
 
