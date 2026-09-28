@@ -20,6 +20,7 @@ Current examples:
 - `skills/grill-me/`
 - `skills/make-interfaces-feel-better/`
 - `skills/pr-feedback/`
+- `skills/simplify/`
 - `skills/stack/`
 - `skills/stack-with-graphite/`
 - `skills/thermo-nuclear-code-quality-review/`
