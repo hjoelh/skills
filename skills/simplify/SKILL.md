@@ -7,8 +7,6 @@ description: Review changed code for reuse, quality, and efficiency with three p
 
 Review all changed files for reuse, quality, and efficiency. Fix issues without changing intended behavior or expanding the task.
 
-<!-- Adapted from @anthropic-ai/claude-code 2.1.70, bundled simplify prompt. -->
-
 ## Phase 1: Identify Changes
 
 Run `git status --short` and `git diff` to see what changed. If there are staged changes, use `git diff HEAD` to include both staged and unstaged changes. Read any untracked files in scope too, since Git diffs omit them.
