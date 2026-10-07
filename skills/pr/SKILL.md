@@ -26,10 +26,24 @@ Create the draft pull request with `gh`, targeting the repository's default bran
    - If the current branch is the detected default, the requested base, or an integration branch such as `main`, `master`, or `dev`, create and switch to a feature branch before continuing.
 4. Look for an open PR in the target repository for the resolved head with `gh pr list --repo <repository> --head <head> --state open --json number,url,baseRefName,headRefName,headRepository,headRepositoryOwner,isDraft`. Verify the head repository as well as the branch name, especially for forks. Reuse a matching PR instead of creating another. If its base differs from the requested base, report the mismatch and ask which base to use before retargeting or publishing more changes. Preserve an existing PR's draft/ready status.
 5. Stage and commit only task-related changes on the resolved head branch. Preserve unrelated staged and unstaged work; do not use a blanket commit that includes unrelated index entries. Use path- or hunk-scoped staging and an isolated index when needed. Review the exact proposed commit diff before committing; ask only when ownership of mixed changes cannot be determined.
-6. Read the full branch diff with `git diff <base>...HEAD`, plus its commit history, so the title and body describe all changes in the PR. Lead the body with the problem or reason for the work, then explain the resulting behavior. Keep it to a short summary; do not add a `Test plan` section unless requested.
+6. Read the full branch diff with `git diff <base>...HEAD`, plus its commit history, so the title and body describe all changes in the PR. Lead the body with the problem or reason for the work, then explain the resulting behavior. Use the PR description guidance below for a concise, visually descriptive body; do not add a `Test plan` section unless requested.
 7. Write the PR body to a temporary UTF-8 file using a file tool or a quoted heredoc. Preserve literal newlines, blank lines between bullets, backticks, and shell characters. Pass the file with `--body-file`, never interpolate the body into a shell command.
 8. Push the resolved head as needed. For a new PR, run `gh pr create --repo <repository> --draft --base <base> --head <head> --title <title> --body-file <body-file>`. For an existing PR, update its title/body with `gh pr edit <number> --repo <repository> --title <title> --body-file <body-file>` when needed, preserving useful existing context. Remove the temporary file after success.
 9. Share the PR URL and exact base/head branches, saying whether the PR was created or reused. Report checks actually run and any failures, blockers, or checks not run in the handoff; omitting a test-plan section must not imply validation passed.
+
+## PR description
+
+- Lead with why the change is needed and the resulting behavior. Use Markdown bullets for the summary, with bold lead-ins that make the main points clear when skimmed.
+
+- Make the change easy to picture: describe concrete triggers, affected users or components, and before/after behavior instead of listing files or vague implementation work.
+
+- Use compact Markdown tables when comparing before/after behavior, multiple cases, or configuration values. Prefer columns such as `Scenario | Before | After`; keep simple changes as bullets when a table adds no clarity.
+
+- Add visual evidence where it helps: embed available before/after screenshots with labels and captions for UI changes, or use a small Mermaid diagram for a flow or relationship that is clearer visually. Use real, accessible evidence; do not invent screenshots, URLs, or verification results. Do not force a visual into every PR.
+
+- Keep exact thresholds, scope, limitations, and material risks beside the change they qualify. Use short headings to separate distinct topics when needed, and avoid repeating the same explanation in bullets, tables, and diagrams.
+
+- Scale detail to the diff: default to 2-4 summary bullets, then add only comparisons or visuals that help a reviewer understand the change. Follow repository templates and explicit user formatting requests.
 
 ## Guardrails
 
@@ -41,7 +55,7 @@ Create the draft pull request with `gh`, targeting the repository's default bran
 - Resolve the PR branch before creating any new commit so the commit lands on the correct branch.
 - If the PR-worthy changes are not committed yet, create a commit on the resolved PR branch before opening the PR.
 - If PR creation has an uncertain outcome, check for an existing PR before retrying to avoid duplicate creation.
-- Keep the title and body tight; default to 1 short title and 2-4 body bullets or sentences.
+- Keep the title short and the body scannable; default to 2-4 summary bullets, adding useful tables or focused visuals only when they clarify the change.
 - When using bullet points, put a blank line between each bullet so they render as separate paragraphs.
 - Always open new PRs as drafts, even if the user does not explicitly ask for one; preserve the status of reused PRs.
 - Do not include a test plan, checklist, or boilerplate footer unless the user asks.
